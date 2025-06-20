@@ -2,7 +2,9 @@ package com.limingzheng.productsearch.controller;
 
 import com.limingzheng.productsearch.entity.Product;
 import com.limingzheng.productsearch.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -12,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/products")
+@Tag(name = "Product API", description = "Endpoints for managing and searching products")
 public class ProductController {
     private final ProductService productService;
 
@@ -20,12 +23,14 @@ public class ProductController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all products", description = "Retrieve a list of all products")
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) {
+    @Operation(summary = "Get product by ID", description = "Retrieve a specific product by its ID")
+    public Product getProductById(@Parameter(description = "Product ID") @PathVariable Long id) {
         return productService.getProductById(id);
     }
 
@@ -38,11 +43,12 @@ public class ProductController {
      * @return A list of matching products.
      */
     @GetMapping("/search")
+    @Operation(summary = "Search products", description = "Search and filter products based on various criteria")
     public Page<Product> searchProducts(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice,
+            @Parameter(description = "Search keyword for title or description") @RequestParam(required = false) String keyword,
+            @Parameter(description = "Product category to filter by") @RequestParam(required = false) String category,
+            @Parameter(description = "Minimum price to filter by") @RequestParam(required = false) Double minPrice,
+            @Parameter(description = "Maximum price to filter by") @RequestParam(required = false) Double maxPrice,
             @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
         return productService.searchProducts(keyword, category, minPrice, maxPrice, pageable);
@@ -54,8 +60,9 @@ public class ProductController {
      * @return A list of matching products.
      */
     @GetMapping("/keyword/{keyword}")
+    @Operation(summary = "Search products by keyword", description = "Search products based on keyword in title or description")
     public Page<Product> searchProductsByKeyword(
-            @PathVariable String keyword,
+            @Parameter(description = "Search keyword") @PathVariable String keyword,
             @PageableDefault(size = 10) Pageable pageable) {
         return productService.findByKeyword(keyword, pageable);
     }
@@ -66,8 +73,9 @@ public class ProductController {
      * @return A list of matching products.
      */
     @GetMapping("/category/{category}")
+    @Operation(summary = "Search products by category", description = "Search products based on category")
     public Page<Product> searchProductsByCategory(
-            @PathVariable String category,
+            @Parameter(description = "Product category") @PathVariable String category,
             @PageableDefault(size = 10) Pageable pageable) {
         return productService.findByCategory(category, pageable);
     }
@@ -79,9 +87,10 @@ public class ProductController {
      * @return A list of matching products.
      */
     @GetMapping("/price-range")
+    @Operation(summary = "Search products by price range", description = "Search products within a specific price range")
     public Page<Product> searchProductsByCategory(
-            @RequestParam Double minPrice,
-            @RequestParam Double maxPrice,
+            @Parameter(description = "Minimum price") @RequestParam Double minPrice,
+            @Parameter(description = "Maximum price") @RequestParam Double maxPrice,
             @PageableDefault(size = 10) Pageable pageable
     ) {
         return productService.findByPriceRange(minPrice, maxPrice, pageable);
