@@ -23,4 +23,20 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
 
+    public List<Product> findByKeyword(String keyword) {
+        return productRepository.findByKeyword(keyword);
+    }
+
+    public List<Product> findByCategory(String category) {
+        return productRepository.findByCategory(category);
+    }
+
+    public List<Product> findByPriceRange(Double minPrice, Double maxPrice) {
+        return productRepository.findByPriceBetween(minPrice, maxPrice);
+    }
+
+    public List<Product> searchProducts(String keyword, String category, Double minPrice, Double maxPrice) {
+        return productRepository.searchProducts(keyword, category, minPrice, maxPrice);
+    }
+
 }
