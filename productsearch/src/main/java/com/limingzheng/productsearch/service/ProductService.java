@@ -3,6 +3,8 @@ package com.limingzheng.productsearch.service;
 import com.limingzheng.productsearch.entity.Product;
 import com.limingzheng.productsearch.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,20 +25,20 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
 
-    public List<Product> findByKeyword(String keyword) {
-        return productRepository.findByKeyword(keyword);
+    public Page<Product> findByKeyword(String keyword, Pageable pageable) {
+        return productRepository.findByKeyword(keyword, pageable);
     }
 
-    public List<Product> findByCategory(String category) {
-        return productRepository.findByCategory(category);
+    public Page<Product> findByCategory(String category, Pageable pageable) {
+        return productRepository.findByCategory(category, pageable);
     }
 
-    public List<Product> findByPriceRange(Double minPrice, Double maxPrice) {
-        return productRepository.findByPriceBetween(minPrice, maxPrice);
+    public Page<Product> findByPriceRange(Double minPrice, Double maxPrice, Pageable pageable) {
+        return productRepository.findByPriceBetween(minPrice, maxPrice, pageable);
     }
 
-    public List<Product> searchProducts(String keyword, String category, Double minPrice, Double maxPrice) {
-        return productRepository.searchProducts(keyword, category, minPrice, maxPrice);
+    public Page<Product> searchProducts(String keyword, String category, Double minPrice, Double maxPrice, Pageable pageable) {
+        return productRepository.searchProducts(keyword, category, minPrice, maxPrice, pageable);
     }
 
 }

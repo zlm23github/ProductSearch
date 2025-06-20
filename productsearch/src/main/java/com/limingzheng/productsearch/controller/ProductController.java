@@ -3,6 +3,9 @@ package com.limingzheng.productsearch.controller;
 import com.limingzheng.productsearch.entity.Product;
 import com.limingzheng.productsearch.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,13 +38,14 @@ public class ProductController {
      * @return A list of matching products.
      */
     @GetMapping("/search")
-    public List<Product> searchProducts(
+    public Page<Product> searchProducts(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice
+            @RequestParam(required = false) Double maxPrice,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable
     ) {
-        return productService.searchProducts(keyword, category, minPrice, maxPrice);
+        return productService.searchProducts(keyword, category, minPrice, maxPrice, pageable);
     }
 
     /**
@@ -50,8 +54,10 @@ public class ProductController {
      * @return A list of matching products.
      */
     @GetMapping("/keyword/{keyword}")
-    public List<Product> searchProductsByKeyword(@PathVariable String keyword) {
-        return productService.findByKeyword(keyword);
+    public Page<Product> searchProductsByKeyword(
+            @PathVariable String keyword,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return productService.findByKeyword(keyword, pageable);
     }
 
     /**
@@ -60,8 +66,10 @@ public class ProductController {
      * @return A list of matching products.
      */
     @GetMapping("/category/{category}")
-    public List<Product> searchProductsByCategory(@PathVariable String category) {
-        return productService.findByCategory(category);
+    public Page<Product> searchProductsByCategory(
+            @PathVariable String category,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return productService.findByCategory(category, pageable);
     }
 
     /**
@@ -71,11 +79,12 @@ public class ProductController {
      * @return A list of matching products.
      */
     @GetMapping("/price-range")
-    public List<Product> searchProductsByCategory(
+    public Page<Product> searchProductsByCategory(
             @RequestParam Double minPrice,
-            @RequestParam Double maxPrice
+            @RequestParam Double maxPrice,
+            @PageableDefault(size = 10) Pageable pageable
     ) {
-        return productService.findByPriceRange(minPrice, maxPrice);
+        return productService.findByPriceRange(minPrice, maxPrice, pageable);
     }
 
 
