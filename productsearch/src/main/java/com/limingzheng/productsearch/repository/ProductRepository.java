@@ -9,6 +9,9 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     //Keyword fuzzy search (title or description)
+    @Query("SELECT p FROM Product p WHERE " +
+            "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Product> findByKeyword(String keyword);
 
     //Filter by category

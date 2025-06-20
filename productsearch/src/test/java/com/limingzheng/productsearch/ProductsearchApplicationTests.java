@@ -29,4 +29,34 @@ class ProductsearchApplicationTests {
 				.andExpect(status().isOk());
 	}
 
+	@Test
+	public void testSearchProductsByKeyword() throws Exception {
+		String keyword = "phone";
+		mockMvc.perform(get("/api/products/keyword/{keyword}", keyword))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	public void testSearchProductsByCategory() throws Exception {
+		String category = "computer";
+		mockMvc.perform(get("/api/products/category/{category}", category))
+				.andExpect(status().isOk());
+
+	}
+
+	@Test
+	public void testSearchProductsByPriceRange() throws Exception {
+		Double minPrice = 10.0;
+		Double maxPrice = 100.0;
+		mockMvc.perform(get("/api/products/price-range")
+						.param("minPrice", String.valueOf(minPrice))
+						.param("maxPrice", String.valueOf(maxPrice)))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	public void testSearchProducts() throws Exception {
+		mockMvc.perform(get("/api/products/search")).andExpect(status().isOk());
+	}
+
 }
