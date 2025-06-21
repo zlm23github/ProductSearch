@@ -27,16 +27,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByPriceBetween(Double minPrice, Double maxPrice, Pageable pageable);
 
     // Combined query: keyword + category + price range
-    @Query(value = "SELECT p FROM Product p WHERE " +
-            "(:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+    @Query(value = "SELECT * FROM product p WHERE " +
+            "(:keyword IS NULL OR MATCH(p.title, p.description) AGAINST (:keyword IN BOOLEAN MODE)) " +
             "AND (:category IS NULL OR p.category = :category) " +
             "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
             "AND (:maxPrice IS NULL OR p.price <= :maxPrice)",
-            countQuery = "SELECT COUNT(p) FROM Product p WHERE " +
-                    "(:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            countQuery = "SELECT count(*) FROM product p WHERE " +
+                    "(:keyword IS NULL OR MATCH(p.title, p.description) AGAINST (:keyword IN BOOLEAN MODE)) " +
                     "AND (:category IS NULL OR p.category = :category) " +
                     "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
-                    "AND (:maxPrice IS NULL OR p.price <= :maxPrice)")
+                    "AND (:maxPrice IS NULL OR p.price <= :maxPrice)",
+            nativeQuery = true)
     Page<Product> searchProducts(
             @Param("keyword") String keyword,
             @Param("category") String category,
