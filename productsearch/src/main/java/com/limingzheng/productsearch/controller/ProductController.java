@@ -1,6 +1,8 @@
 package com.limingzheng.productsearch.controller;
 
 import com.limingzheng.productsearch.entity.Product;
+import com.limingzheng.productsearch.es.entity.ProductDocument;
+import com.limingzheng.productsearch.es.service.ProductESService;
 import com.limingzheng.productsearch.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,21 +19,11 @@ import java.util.List;
 @Tag(name = "Product API", description = "Endpoints for managing and searching products")
 public class ProductController {
     private final ProductService productService;
+    private final ProductESService productESService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ProductESService productESService) {
         this.productService = productService;
-    }
-
-    @GetMapping
-    @Operation(summary = "Get all products", description = "Retrieve a list of all products")
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
-    }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "Get product by ID", description = "Retrieve a specific product by its ID")
-    public Product getProductById(@Parameter(description = "Product ID") @PathVariable Long id) {
-        return productService.getProductById(id);
+        this.productESService = productESService;
     }
 
     /**
@@ -55,46 +47,24 @@ public class ProductController {
     }
 
     /**
-     * Search and filter products based on keyword.
-     * @param keyword Search keyword for title or description.
-     * @return A list of matching products.
+     * Searches for products in Elasticsearch based on multiple criteria.
+     *
+     * @param keyword  The keyword for full-text search within the 'title' and 'description' fields.
+     * @param category The product category to filter by.
+     * @param minPrice The minimum price for the range filter.
+     * @param maxPrice The maximum price for the range filter.
+     * @param pageable Pagination and sorting information automatically provided by Spring Data.
+     * @return Paginated Elasticsearch product documents (Page<ProductDocument>)
      */
-    @GetMapping("/keyword/{keyword}")
-    @Operation(summary = "Search products by keyword", description = "Search products based on keyword in title or description")
-    public Page<Product> searchProductsByKeyword(
-            @Parameter(description = "Search keyword") @PathVariable String keyword,
-            @PageableDefault(size = 10) Pageable pageable) {
-        return productService.findByKeyword(keyword, pageable);
-    }
+    @GetMapping("/search-es")
+    public Page<ProductDocument> searchESProducts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            Pageable pageable) {
 
-    /**
-     * Search and filter products based on category.
-     * @param category Product category to filter by
-     * @return A list of matching products.
-     */
-    @GetMapping("/category/{category}")
-    @Operation(summary = "Search products by category", description = "Search products based on category")
-    public Page<Product> searchProductsByCategory(
-            @Parameter(description = "Product category") @PathVariable String category,
-            @PageableDefault(size = 10) Pageable pageable) {
-        return productService.findByCategory(category, pageable);
+        return productESService.searchProducts(keyword, category, minPrice, maxPrice, pageable);
     }
-
-    /**
-     * Search and filter products based on category.
-     * @param minPrice Minimum price to filter by
-     * @param maxPrice Maximum price to filter by
-     * @return A list of matching products.
-     */
-    @GetMapping("/price-range")
-    @Operation(summary = "Search products by price range", description = "Search products within a specific price range")
-    public Page<Product> searchProductsByCategory(
-            @Parameter(description = "Minimum price") @RequestParam Double minPrice,
-            @Parameter(description = "Maximum price") @RequestParam Double maxPrice,
-            @PageableDefault(size = 10) Pageable pageable
-    ) {
-        return productService.findByPriceRange(minPrice, maxPrice, pageable);
-    }
-
 
 }

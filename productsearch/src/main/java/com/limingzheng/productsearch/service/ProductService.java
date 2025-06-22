@@ -17,26 +17,6 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
-    }
-
-    public Product getProductById(Long id) {
-        return productRepository.findById(id).orElse(null);
-    }
-
-    public Page<Product> findByKeyword(String keyword, Pageable pageable) {
-        return productRepository.findByKeyword(keyword, pageable);
-    }
-
-    public Page<Product> findByCategory(String category, Pageable pageable) {
-        return productRepository.findByCategory(category, pageable);
-    }
-
-    public Page<Product> findByPriceRange(Double minPrice, Double maxPrice, Pageable pageable) {
-        return productRepository.findByPriceBetween(minPrice, maxPrice, pageable);
-    }
-
     public Page<Product> searchProducts(String keyword, String category, Double minPrice, Double maxPrice, Pageable pageable) {
         return productRepository.searchProducts(keyword, category, minPrice, maxPrice, pageable);
     }
