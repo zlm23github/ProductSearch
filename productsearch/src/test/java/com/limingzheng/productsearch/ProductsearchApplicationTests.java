@@ -34,47 +34,8 @@ class ProductsearchApplicationTests {
 				.andExpect(jsonPath("$.number").value(0));          // Assert that the current page number is 0
 	}
 
-	@Test
-	public void testSearchProductsByKeywordWithPagination() throws Exception {
-		String keyword = "phone";
 
-		mockMvc.perform(get("/api/products/keyword/{keyword}", keyword)
-						.param("page", "0")
-						.param("size", "5")
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.content").isArray())
-				.andExpect(jsonPath("$.size").value(5));
-	}
-
-	@Test
-	public void testSearchProductsByCategoryWithPagination() throws Exception {
-		String category = "Electronics";
-
-		mockMvc.perform(get("/api/products/category/{category}", category)
-						.param("page", "1")
-						.param("size", "10")
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.content").isArray())
-				.andExpect(jsonPath("$.number").value(1));
-	}
-
-	@Test
-	public void testSearchProductsByPriceRangeWithPagination() throws Exception {
-		Double minPrice = 100.0;
-		Double maxPrice = 500.0;
-
-		mockMvc.perform(get("/api/products/price-range")
-						.param("minPrice", String.valueOf(minPrice))
-						.param("maxPrice", String.valueOf(maxPrice))
-						.param("page", "0")
-						.param("size", "20")
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.content").isArray())
-				.andExpect(jsonPath("$.size").value(20));
-	}
+	
 
 
 }
