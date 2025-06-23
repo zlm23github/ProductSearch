@@ -3,6 +3,7 @@ package com.limingzheng.productsearch.controller;
 import com.limingzheng.productsearch.entity.Product;
 import com.limingzheng.productsearch.es.entity.ProductDocument;
 import com.limingzheng.productsearch.es.service.ProductESService;
+import com.limingzheng.productsearch.service.DataSyncService;
 import com.limingzheng.productsearch.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,10 +22,12 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
     private final ProductESService productESService;
+    private final DataSyncService dataSyncService;
 
-    public ProductController(ProductService productService, ProductESService productESService) {
+    public ProductController(ProductService productService, ProductESService productESService, DataSyncService dataSyncService) {
         this.productService = productService;
         this.productESService = productESService;
+        this.dataSyncService = dataSyncService;
     }
 
     /**
@@ -57,6 +61,7 @@ public class ProductController {
      * @return Paginated Elasticsearch product documents (Page<ProductDocument>)
      */
     @GetMapping("/search-es")
+    @Operation(summary = "Search products using ElasticSearch", description = "Search and filter products based on various criteria using ES")
     public Page<ProductDocument> searchESProducts(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String category,
@@ -65,6 +70,17 @@ public class ProductController {
             Pageable pageable) {
 
         return productESService.searchProducts(keyword, category, minPrice, maxPrice, pageable);
+    }
+
+    /**
+    * Triggers a full data synchronization from the database to Elasticsearch.
+    * @return A confirmation message indicating the process has started.
+    */
+    @PostMapping("/sync")
+    @Operation(summary = "Sync data from DB to Elasticsearch", description = "Triggers a full synchronization of product data from the primary database to Elasticsearch. This can be a long-running operation.")
+    public ResponseEntity<String> syncData() {
+        dataSyncService.syncAllProducts();
+        return ResponseEntity.ok("Data synchronization to Elasticsearch has been initiated.");
     }
 
 }
